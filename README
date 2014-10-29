@@ -1,0 +1,11 @@
+#########
+# nsenter
+
+PID=$(docker inspect --format {{.State.Pid}} <container>)
+nsenter --target $PID --mount --uts --ipc --net --pid
+
+# can also run a single command
+nsenter --target $PID --mount --uts --ipc --net --pid ls
+
+# might have to call a shell installed in the containter to get a shell
+nsenter --target $PID --mount --uts --ipc --net --pid bash
