@@ -1,0 +1,21 @@
+#
+# Build wildfly image w/ custome config files
+
+docker build -t brianjolly/wildfly8 .
+
+# nsenter container to debug
+# PID=$(docker inspect --format {{.State.Pid}} jboss8)
+# sudo nsenter --target $PID --mount --uts --ipc --net --pid /data/deploy-in.sh
+
+# JBOSS_HOME=/opt/wildfly/
+
+# start container
+docker run -it --rm -p 8080:8080 -p 9990:9990 --name wildfly8 -v $(pwd):/data/ brianjolly/wildfly8
+
+# start a container that will just run a script
+docker run --rm --volumes-from wildfly8 --link wildfly8:jboss_host brianjolly/wildfly8 sh /data/deploy.sh sample.war
+docker run --rm --volumes-from wildfly8 --link wildfly8:jboss_host brianjolly/wildfly8 sh /data/undeploy.sh sample.war
+docker run --rm --volumes-from wildfly8 --link wildfly8:jboss_host brianjolly/wildfly8 sh /data/list.sh
+# get copies of configs if chaged
+docker run --rm --volumes-from wildfly8 --link wildfly8:jboss_host brianjolly/wildfly8 sh /data/catconfigs.sh > out.txt
+
