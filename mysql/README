@@ -1,0 +1,19 @@
+docker pull mysql:latest
+
+start a mysql instance
+
+docker run --name test-mysql -e MYSQL_ROOT_PASSWORD=mysecretpassword -d mysql
+docker run --name test-mysql -v $(pwd)/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=mysecretpassword -d mysql
+
+This image includes EXPOSE 3306 (the mysql port), so standard container linking will make it automatically available to the linked containers (as the following examples illustrate).
+
+connect to it from an application
+docker run --name test-app --link test-mysql:mysql -d application-that-uses-mysql
+
+or via mysql cli
+docker run -it -v $(pwd):/share --link test-mysql:mysql --rm mysql sh -c 'exec mysql -h"$MYSQL_PORT_3306_TCP_ADDR" -P"$MYSQL_PORT_3306_TCP_PORT" -uroot -p"$MYSQL_ENV_MYSQL_ROOT_PASSWORD"'
+
+-- In cli:
+-- source /share/threewayjoin.sql
+
+
