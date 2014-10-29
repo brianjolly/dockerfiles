@@ -1,0 +1,23 @@
+docker build -t phantom_soup .
+
+# run interactive container
+docker run -it --name scraping --rm -v $(pwd):/working phantom_soup bash
+
+# run postgres db instance 
+docker run --name postgres-web -d postgres:9.4
+docker logs -f postgres-web
+
+# run psql client
+docker run -it --name postgres-psql --link postgres-web:postgres --rm postgres:9.4 sh -c 'exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres'
+
+# run scraper interactive connecting to postgres
+docker run --rm -it --name scraping -v $(pwd):/working --link postgres-web:postgres phantom_soup bash
+
+
+
+exec(open("./ph.py").read())
+
+phantomjs vimeo.js
+
+# page through vimeo user's pages
+python vimeo-pages.py
