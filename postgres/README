@@ -1,0 +1,15 @@
+ 
+docker pull postgres:9.4
+
+# run server
+docker run --name postgres-web -d postgres:9.4
+
+# watch server logs
+docker logs -f postgres-web
+
+# connect client app
+docker run --name some-app --link postgres-web:postgres -d application-that-uses-postgres
+
+# connect client cli
+docker run -it --name postgres-psql --rm --link postgres-web:postgres --rm postgres:9.4 sh -c 'exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres'
+
